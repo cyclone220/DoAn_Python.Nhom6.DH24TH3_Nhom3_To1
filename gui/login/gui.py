@@ -17,7 +17,7 @@ class Login(Toplevel):
     
     def loginFunc(self):
         global user
-        if self.username.get()=="username" and self.password.get()=="password":
+        if self.username.get()=="username" and self.password.get()=="123":
             mainWindow()
             self.destroy()
             return

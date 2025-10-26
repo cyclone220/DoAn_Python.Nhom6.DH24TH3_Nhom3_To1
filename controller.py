@@ -44,23 +44,6 @@ def human_format(num):
     return "%.1f%s" % (num, ["", "K", "M", "G", "T", "P"][magnitude])
 
 
-def updatePassword(username, sec_ans, sec_que, password):
-    cmd = f"update login set password='{password}' where username='{username}' and sec_ans='{sec_ans}' and sec_que='{sec_que}' limit 1;"
-    cursor.execute(cmd)
-    cmd = f"select count(username) from login where username='{username}' and password='{password}' and sec_ans='{sec_ans}' and sec_que='{sec_que}';"
-    cursor.execute(cmd)
-    return cursor.fetchone()[0] >= 1
-
-
-def updateUsername(oldusername, password, newusername):
-    cmd = f"update login set username='{newusername}' where username='{oldusername}' and password='{password}' limit 1;"
-    cursor.execute(cmd)
-    cmd = f"select count(username) from login where username='{newusername}' and password='{password}''"
-    cursor.execute(cmd)
-    return cursor.fetchone()[0] >= 1
-
-
-
 def find_g_id(name):
     cmd = f"select g_id from guests where name = '{name}'"
     cursor.execute(cmd)
@@ -123,8 +106,8 @@ def add_guest(name, address, email_id, phone):
 
 
 # add a room
-def add_room(room_no, price, room_type):
-    cmd = f"insert into rooms(room_no,price,room_type) values('{room_no}',{price},'{room_type}');"
+def add_room(SoPhong, LoaiPhong):
+    cmd = f"insert into rooms(SoPhong,LoaiPhong) values('{SoPhong}','{LoaiPhong}');"
     cursor.execute(cmd)
     if cursor.rowcount == 0:
         return False
@@ -133,7 +116,7 @@ def add_room(room_no, price, room_type):
 
 # Get All rooms
 def get_rooms():
-    cmd = "select id, room_no, room_type, price, created_at from rooms;"
+    cmd = "select MaPhong, SoPhong, LoaiPhong, Gia, ConTrong from rooms;"
     cursor.execute(cmd)
     if cursor.rowcount == 0:
         return False
