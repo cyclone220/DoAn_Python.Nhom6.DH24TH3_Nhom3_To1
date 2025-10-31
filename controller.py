@@ -106,8 +106,8 @@ def add_guest(name, address, email_id, phone):
 
 
 # add a room
-def add_room(SoPhong, LoaiPhong):
-    cmd = f"insert into rooms(SoPhong,LoaiPhong) values('{SoPhong}','{LoaiPhong}');"
+def add_room(SoPhong, LoaiPhong, ConTrong):
+    cmd = f"insert into rooms(SoPhong,LoaiPhong,ConTrong) values('{SoPhong}','{LoaiPhong}','{ConTrong}');"
     cursor.execute(cmd)
     if cursor.rowcount == 0:
         return False
@@ -116,7 +116,7 @@ def add_room(SoPhong, LoaiPhong):
 
 # Get All rooms
 def get_rooms():
-    cmd = "select MaPhong, SoPhong, LoaiPhong, Gia, ConTrong from rooms;"
+    cmd = "select MaPhong, SoPhong, LoaiPhong, Gia, ConTrong, NgayNhap from rooms;"
     cursor.execute(cmd)
     if cursor.rowcount == 0:
         return False
@@ -194,7 +194,7 @@ def delete_reservation(id):
 
 
 def delete_room(id):
-    cmd = f"delete from rooms where id='{id}';"
+    cmd = f"delete from rooms where MaPhong='{id}';"
     cursor.execute(cmd)
     if cursor.rowcount == 0:
         return False
@@ -209,8 +209,8 @@ def delete_guest(id):
     return True
 
 
-def update_rooms(id, room_no, room_type, price):
-    cmd = f"update rooms set room_type = '{room_type}',price= {price}, room_no = {room_no} where id = {id};"
+def update_rooms(id, room_no, room_type,occupation):
+    cmd = f"update rooms set LoaiPhong = '{room_type}', SoPhong = {room_no}, ConTrong={occupation} where MaPhong = {id};"
     cursor.execute(cmd)
     if cursor.rowcount == 0:
         return False

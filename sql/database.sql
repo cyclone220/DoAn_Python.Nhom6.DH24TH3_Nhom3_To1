@@ -24,16 +24,6 @@ CREATE TABLE `guests` (
   PRIMARY KEY (`MaKH`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-
-CREATE VIEW view_guests AS
-SELECT 
-  MaKH,
-  Hoten,
-  Dchi,
-  Sdt,
-  DATE_FORMAT(NgayNhap, '%d/%m/%Y %H:%i:%s') AS NgayNhap
-FROM guests;
-
 LOCK TABLES `guests` WRITE;
 /*!40000 ALTER TABLE `guests` DISABLE KEYS */;
 INSERT INTO `guests` VALUES (001,'Nguyễn Văn A',"Tp.HCM",'0968776113','2025-10-14 08:51:19'),

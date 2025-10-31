@@ -1,5 +1,7 @@
 from pathlib import Path
 from .add_room.gui import AddRooms
+from .view_rooms.main import ViewRooms
+from .update_rooms.main import UpdateRooms
 from tkinter import Frame, Canvas, Entry, Text, Button, PhotoImage, messagebox
 import controller as db_controller
 
@@ -27,8 +29,8 @@ class Rooms(Frame):
         # Loop through windows and place them
         self.windows = {
             "add": AddRooms(self),
-            # "view": ViewRooms(self),
-            # "edit": UpdateRooms(self),
+            "view": ViewRooms(self),
+            "edit": UpdateRooms(self),
         }
 
         self.current_window = self.windows["add"]

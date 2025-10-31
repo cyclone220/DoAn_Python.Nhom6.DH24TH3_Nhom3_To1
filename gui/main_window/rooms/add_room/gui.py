@@ -29,7 +29,7 @@ class AddRooms(Frame):
     def __init__(self, parent, controller=None, *args, **kwargs):
         Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.data = {"SoPhong": StringVar(), "Loai": StringVar()}
+        self.data = {"SoPhong": StringVar(), "ConTrong": StringVar(), "Loai": StringVar()}
 
         self.configure(bg="#FFFFFF")
 
@@ -76,7 +76,7 @@ class AddRooms(Frame):
             293.0,
             128.0,
             anchor="nw",
-            text="Loại phòng: Đơn/Đôi/Vip",
+            text="Loại: Đơn/Đôi/Vip",
             fill="#5E95FF",
             font=("Montserrat Bold", 14 * -1),
         )
@@ -94,14 +94,40 @@ class AddRooms(Frame):
         )
         self.entry_3.place(x=293.0, y=153.0, width=179.0, height=22.0)
 
+        self.image_image_2 = PhotoImage(file=relative_to_assets("image_2.png"))
+        self.image_2 = self.canvas.create_image(258.0, 259.0, image=self.image_image_2)
+
         self.canvas.create_text(
-            293.0,
-            155.0,
+            52.0,
+            234.0,
+            anchor="nw",
+            text="Tình trạng sử dụng: (T)rống/Đang (D)ùng",
+            fill="#5E95FF",
+            font=("Montserrat Bold", 14 * -1),
+        )
+
+        self.entry_image_2 = PhotoImage(file=relative_to_assets("entry_2.png"))
+        self.entry_bg_2 = self.canvas.create_image(257.5, 271.0, image=self.entry_image_2)
+        self.entry_2 = Entry(
+            self,
+            textvariable=self.data["ConTrong"],
+            bd=0,
+            bg="#EFEFEF",
+            highlightthickness=0,
+            font=("Montserrat Bold", 18 * -1),
+            foreground="#777777",
+        )
+        self.entry_2.place(x=52.0, y=259.0, width=411.0, height=22.0)
+
+        self.canvas.create_text(
+            52.0,
+            261.0,
             anchor="nw",
             text="1024",
             fill="#000000",
             font=("Montserrat SemiBold", 17 * -1),
         )
+
 
         self.button_image_1 = PhotoImage(file=relative_to_assets("button_1.png"))
         self.button_1 = Button(
@@ -169,8 +195,20 @@ class AddRooms(Frame):
         # Save the room
         try:
             # Save the room
+            Sophong = self.entry_1.get()
+            Loai = self.entry_3.get()
+            Loai.lower()
+            loaiphong = {
+                "đơn": "don",
+                "đôi": "doi",
+                "vip": "vip"
+            }
+            Loai = loaiphong.get(Loai)
+            
+            TinhTrang = 1 if self.entry_2.get().lower() == "t" else 0
+            
             result = db_controller.add_room(
-                *[self.data[label].get() for label in ("SoPhong", "Loai")]
+                Sophong, Loai, TinhTrang
             )
 
             if result:
