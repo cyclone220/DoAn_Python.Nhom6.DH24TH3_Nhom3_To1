@@ -51,7 +51,7 @@ class AddRooms(Frame):
             52.0,
             128.0,
             anchor="nw",
-            text="Số phòng",
+            text="Số phòng:",
             fill="#5E95FF",
             font=("Montserrat Bold", 14 * -1),
         )

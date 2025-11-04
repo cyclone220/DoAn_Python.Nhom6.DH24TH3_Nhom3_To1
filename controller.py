@@ -89,7 +89,7 @@ def acceptable(*args, acceptables):
 
 # Get all guests
 def get_guests():
-    cmd = "select id, name, address, email_id, phone, created_at from guests;"
+    cmd = "select MaKH, HoTen, Dchi, sdt, NgayNhap from guests;"
     cursor.execute(cmd)
     if cursor.rowcount == 0:
         return False
@@ -97,8 +97,8 @@ def get_guests():
 
 
 # Add a guest
-def add_guest(name, address, email_id, phone):
-    cmd = f"insert into guests(name,address,email_id,phone) values('{name}','{address}','{email_id}',{phone});"
+def add_guest(name, address, phone):
+    cmd = f"insert into guests(HoTen,Dchi,Sdt) values('{name}','{address}',{phone});"
     cursor.execute(cmd)
     if cursor.rowcount == 0:
         return False
@@ -122,10 +122,16 @@ def get_rooms():
         return False
     return cursor.fetchall()
 
+# Get unoccupated rooms
+def get_unoccupated_rooms_by_type(Loai):
+    cmd = f"select MaPhong, SoPhong, LoaiPhong, Gia, ConTrong, NgayNhap from rooms where ConTrong = 1 and LoaiPhong = '{Loai}';"
+    cursor.execute(cmd)
+    rows = cursor.fetchall()
+    return rows if rows else []
 
 # Get all reservations
 def get_reservations():
-    cmd = "select id, g_id, r_id, check_in, check_out, meal from reservations;"
+    cmd = "select MaHoaDon,MaPhong,MaKH,NgayCheckin,NgayCheckout from datphong;"
     cursor.execute(cmd)
     if cursor.rowcount == 0:
         return False
@@ -133,13 +139,18 @@ def get_reservations():
 
 
 # Add a reservation
-def add_reservation(g_id, meal, r_id, check_in="now"):
-    cmd = f"insert into reservations(g_id,check_in,r_id, meal) values('{g_id}',{f'{chr(39) + check_in + chr(39)}' if check_in != 'now' else 'current_timestamp'},'{meal}','{r_id}');"
+def add_reservation(MaPhong,MaKH,CheckIn):
+    cmd = f"insert into datphong(MaPhong,MaKH,NgayCheckin) values('{MaPhong}',{MaKH},'{CheckIn}');"
     cursor.execute(cmd)
     if cursor.rowcount == 0:
         return False
-    return True
+    cursor.execute("SELECT MaHoaDon FROM datphong ORDER BY MaHoaDon DESC LIMIT 1;")
+    mahoadon = cursor.fetchone()[0]
 
+    # Gọi procedure cập nhật tổng tiền
+    cursor.callproc("sp_cap_nhat_tong_tien", [mahoadon])
+    connection.commit()
+    return True
 
 # Get all room count
 def get_total_rooms():
@@ -202,7 +213,7 @@ def delete_room(id):
 
 
 def delete_guest(id):
-    cmd = f"delete from guests where id='{id}';"
+    cmd = f"delete from guests where MaKH='{id}';"
     cursor.execute(cmd)
     if cursor.rowcount == 0:
         return False
@@ -219,7 +230,7 @@ def update_rooms(id, room_no, room_type,occupation):
 
 def update_guests(name, address, id, phone):
 
-    cmd = f"update guests set address = '{address}',phone = {phone} , name = '{name}' where id = {id};"
+    cmd = f"update guests set Dchi = '{address}',Sdt = '{phone}' , HoTen = '{name}' where MaKh = {id};"
     cursor.execute(cmd)
     if cursor.rowcount == 0:
         return False

@@ -94,18 +94,17 @@ class UpdateRooms(Frame):
             71.56398010253906,
             145.0,
             anchor="nw",
-            text="Mã Phòng",
+            text="Mã phòng:",
             fill="#5E95FF",
             font=("Montserrat Bold", 14 * -1),
         )
-
+        
         self.id_text = self.canvas.create_text(
-            72.0,
-            172.0,
+            71.56398010253906, 170.0,
             anchor="nw",
-            text="1024",
+            text="",
             fill="#777777",
-            font=("Montserrat SemiBold", 17 * -1),
+            font=("Montserrat Bold", 18 * -1),
         )
 
         self.image_image_2 = PhotoImage(file=relative_to_assets("image_2.png"))
@@ -144,7 +143,7 @@ class UpdateRooms(Frame):
             455.0473937988281,
             145.0,
             anchor="nw",
-            text="Số phòng",
+            text="Số phòng:",
             fill="#5E95FF",
             font=("Montserrat Bold", 14 * -1),
         )
