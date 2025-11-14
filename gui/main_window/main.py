@@ -13,6 +13,7 @@ from gui.main_window.rooms.main import Rooms
 from gui.main_window.guests.main import Guests
 from gui.main_window.dash.main import Dashboard
 from gui.main_window.reservation.main import Reservation
+from gui.main_window.services.main import Services
 from .. import login
 
 
@@ -52,6 +53,7 @@ class MainWindow(Toplevel):
             "roo": "Thông tin phòng",
             "gue": "Thông tin khách hàng",
             "res": "Đặt phòng",
+            "ser": "Dịch vụ"
         }
         
         self.windows[name].place(x=215, y=72, width=1013.0, height=506.0)
@@ -159,11 +161,24 @@ class MainWindow(Toplevel):
         self.reservations_btn.place(x=7.0, y=233.0, width=208.0, height=47.0)
         self.guests_btn.place(x=7.0, y=283.0, width=208.0, height=47.0)
         
+        self.button_image_4 = PhotoImage(file=relative_to_assets("button_4.png"))
+        self.about_btn = Button(
+            self.canvas,
+            image=self.button_image_4,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: self.handle_btn_press(self.about_btn, "ser"),
+            cursor='hand2', activebackground="#5E95FF",
+            relief="flat",
+        )
+        self.about_btn.place(x=7.0, y=333.0, width=208.0, height=47.0)
+        
         self.windows = {
             "dash": Dashboard(self),
             "roo": Rooms(self),
             "gue": Guests(self),
             "res": Reservation(self),
+            "ser": Services(self)
         }
         self.handle_btn_press(self.dashboard_btn, "dash")
         self.sidebar_indicator.place(x=0, y=133)

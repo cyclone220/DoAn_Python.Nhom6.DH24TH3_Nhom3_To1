@@ -158,8 +158,8 @@ class ViewReservations(Frame):
 
         # Show the headings
         self.treeview.heading(list(self.columns.keys())[0], text="Mã HĐ")
-        self.treeview.heading(list(self.columns.keys())[1], text="Mã KH")
-        self.treeview.heading(list(self.columns.keys())[2], text="Mã Phòng")
+        self.treeview.heading(list(self.columns.keys())[1], text="Số Phòng")
+        self.treeview.heading(list(self.columns.keys())[2], text="Tên KH")
         self.treeview.heading(list(self.columns.keys())[3], text="Check In")
         self.treeview.heading(list(self.columns.keys())[4], text="Check Out")
         # Set the column widths
@@ -194,16 +194,71 @@ class ViewReservations(Frame):
         )
 
         self.checkout_btn.place(x=272.0, y=359.0, width=174.0, height=48.0)
-
+        
     def handle_checkout(self, event=None):
         if not self.parent.selected_rid:
-            # Show warning
-            messagebox.showwarning(
-                "Select a Reservation First", "Please select a reservation to checkout"
-            )
-        # Get the selected reservation
+            messagebox.showwarning(None, "Vui lòng chọn một hoá đơn")
+            return
         db_controller.checkout(self.parent.selected_rid)
         self.parent.refresh_entries()
+        ma_hoadon = self.parent.selected_rid
+
+        # 1. Lấy thông tin phòng
+        reservation = db_controller.get_reservation_by_id(ma_hoadon)
+        if not reservation:
+            messagebox.showerror(None, "Không tìm thấy hoá đơn phòng")
+            return
+
+        # reservation = (MaHoaDon, MaPhong, MaKH, NgayCheckin, NgayCheckout, TienPhong, TongTienDV, TongThanhToan)
+        ma_phong = reservation[1]
+        ma_kh = reservation[2]
+        ngay_checkin = reservation[3].strftime("%Y-%m-%d %H:%M") if reservation[3] else ""
+        ngay_checkout = reservation[4].strftime("%Y-%m-%d %H:%M") if reservation[4] else "Chưa trả phòng"
+        tien_phong = reservation[5]
+        tong_dv = reservation[6]
+        tong_thanh_toan = reservation[7]
+
+        # 2. Lấy danh sách dịch vụ
+        services = db_controller.get_services_by_invoice(ma_hoadon)
+        # services = [(TenDV, SoLuong, ThanhTien), ...]
+
+        service_text = ""
+        if services:
+            for ten_dv, so_luong, thanh_tien in services:
+                service_text += f"{ten_dv} x {so_luong} = {thanh_tien} VND\n"
+        else:
+            service_text = "Không có dịch vụ nào."
+
+        # 3. Tạo nội dung hoá đơn
+        invoice_text = f"""
+    Hoá đơn: {ma_hoadon}
+    Mã phòng: {ma_phong}
+    Mã khách hàng: {ma_kh}
+    Ngày check-in: {ngay_checkin}
+    Ngày check-out: {ngay_checkout}
+    Tiền phòng: {tien_phong} VND
+    --- Dịch vụ ---
+    {service_text}
+    Tổng thanh toán: {tong_thanh_toan} VND
+    """
+
+        # 4. Hiển thị hoá đơn
+        messagebox.showinfo("Hoá đơn thanh toán", invoice_text)
+
+        # 5. Xử lý checkout thực tế
+        db_controller.checkout(ma_hoadon)
+        self.parent.refresh_entries()
+
+
+    # def handle_checkout(self, event=None):
+    #     if not self.parent.selected_rid:
+    #         # Show warning
+    #         messagebox.showwarning(
+    #             None, "Vui lòng chọn một hoá đơn"
+    #         )
+    #     # Get the selected reservation
+    #     db_controller.checkout(self.parent.selected_rid)
+    #     self.parent.refresh_entries()
 
     def filter_treeview_records(self, query):
         self.treeview.delete(*self.treeview.get_children())
@@ -232,15 +287,23 @@ class ViewReservations(Frame):
 
     def handle_refresh(self):
         self.treeview.delete(*self.treeview.get_children())
-        if self.reservation_data:
-            self.reservation_data = db_controller.get_reservations()
-        else:
-            self.reservation_data = self.parent.reservation_data
 
+        # Lấy dữ liệu reservation
+        self.reservation_data = db_controller.get_reservations()  # [(MaHoaDon, MaPhong, MaKH, CheckIn, CheckOut), ...]
+
+        # Lấy danh sách phòng để tạo room_map: MaPhong -> SoPhong
+        rooms = db_controller.get_rooms()  # [(MaPhong, SoPhong, LoaiPhong, ConTrong), ...]
+        self.room_map = {r[0]: r[1] for r in rooms}  # key=MaPhong, value=SoPhong
+
+        guests = db_controller.get_guests()
+        self.guest_map = {g[0]: g[1] for g in guests} 
         for row in self.reservation_data:
-            self.treeview.insert("", "end", values=row)
+            ma_hoa_don, ma_phong, ma_kh, check_in, check_out = row
+            so_phong = self.room_map.get(ma_phong, ma_phong)  # Nếu không có trong map thì giữ MaPhong
+            ten_KH= self.guest_map.get(ma_kh,ma_kh)
+            self.treeview.insert("", "end", values=(ma_hoa_don, so_phong, ten_KH, check_in, check_out))
 
-        # Refresh the dashboard
+        # Refresh dashboard nếu có
         try: self.parent.parent.handle_dashboard_refresh()
         except: pass
 

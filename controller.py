@@ -64,8 +64,8 @@ def checkin(g_id):
 
 
 
-def checkout(id):
-    cmd = f"update reservations set check_out=current_timestamp where id={id} limit 1;"
+def checkout(MaHoaDon):
+    cmd = f"update datphong set NgayCheckout=current_timestamp where MaHoaDon='{MaHoaDon}' limit 1;"
     cursor.execute(cmd)
     if cursor.rowcount == 0:
         return False
@@ -154,16 +154,52 @@ def add_reservation(MaPhong,MaKH,CheckIn):
 
 # Get all room count
 def get_total_rooms():
-    cmd = "select count(room_no) from rooms;"
+    cmd = "select count(MaPhong) from rooms;"
     cursor.execute(cmd)
     if cursor.rowcount == 0:
         return False
     return cursor.fetchone()[0]
 
+def get_Vip_booked():
+    cmd = f"select count(MaPhong) from rooms where ConTrong = 0 and LoaiPhong = 'vip'"
+    cursor.execute(cmd)
+
+    return cursor.fetchone()[0]
+
+def get_doi_booked():
+    cmd = f"select count(MaPhong) from rooms where ConTrong = 0 and LoaiPhong = 'doi'"
+    cursor.execute(cmd)
+
+    return cursor.fetchone()[0]
+
+def get_don_booked():
+    cmd = f"select count(MaPhong) from rooms where ConTrong = 0 and LoaiPhong = 'don'"
+    cursor.execute(cmd)
+
+    return cursor.fetchone()[0]
+
+def get_reservation_by_id(ma_hoadon):
+    cmd = f"""
+    SELECT MaHoaDon, MaPhong, MaKH, NgayCheckin, NgayCheckout, TienPhong, TongTienDV, TongThanhToan
+    FROM datphong
+    WHERE MaHoaDon = '{ma_hoadon}'
+    """
+    cursor.execute(cmd)
+    return cursor.fetchone()  
+
+def get_services_by_invoice(ma_hoadon):
+    cmd = f"""
+    SELECT dv.TenDV, hd.SoLuong, hd.ThanhTien
+    FROM hoadon hd
+    JOIN dichvu dv ON hd.MaDV = dv.MaDV
+    WHERE hd.MaHoaDon = '{ma_hoadon}'
+    """
+    cursor.execute(cmd)
+    return cursor.fetchall()  
 
 # Check if a room is vacant
 def booked():
-    cmd = f"select count(ros.id) from reservations rs, rooms ros where rs.r_id = ros.id and rs.check_out is Null;"
+    cmd = f"select count(MaPhong) from rooms where ConTrong = 0"
     cursor.execute(cmd)
 
     return cursor.fetchone()[0]
@@ -184,7 +220,25 @@ def bookings():
 
     return [deluxe, Normal]
 
+def get_HoaDon():
+    cmd = "select MaHoaDon from datphong;"
+    cursor.execute(cmd)
+    if cursor.rowcount == 0:
+        return False
+    return cursor.fetchall()
 
+def get_DichVu():
+    cursor.execute("SELECT MaDV, TenDV FROM dichvu;")
+    services = cursor.fetchall()
+    return services
+
+def add_DichVu(ma_hoadon, ma_dv, so_luong):
+    cmd = f"INSERT INTO hoadon (MaHoaDon, MaDV, SoLuong) VALUES ('{ma_hoadon}','{ma_dv}','{so_luong}')"
+    cursor.execute(cmd)
+    connection.commit()
+    if cursor.rowcount == 0:
+        return False
+    return True
 # Get total hotel value
 def get_total_hotel_value():
     cmd = "select sum(price) from rooms;"
@@ -196,8 +250,8 @@ def get_total_hotel_value():
     return human_format(value)
 
 
-def delete_reservation(id):
-    cmd = f"delete from reservations where id='{id}';"
+def delete_reservation(MaHoaDon):
+    cmd = f"delete from datphong where MaHoaDon='{MaHoaDon}';"
     cursor.execute(cmd)
     if cursor.rowcount == 0:
         return False
@@ -248,16 +302,9 @@ def update_reservations(
     return True
 
 
-def meals():
-    cmd = f"select sum(meal) from reservations;"
-    cursor.execute(cmd)
-    meals = cursor.fetchone()[0]
 
-    return human_format(meals)
-
-
-def update_reservation(id, g_id, check_in, room_id, check_out, meal):
-    cmd = f"update reservations set check_in = '{check_in}', check_out = '{check_out}', g_id = {g_id}, meal = '{meal}', r_id = '{room_id}' where id= '{id}';"
+def update_reservation(id, room_id, g_id, check_in):
+    cmd = f"update datphong set NgayCheckin= '{check_in}', MaKH = {g_id}, MaPhong = '{room_id}' where MaHoaDon= '{id}';"
     cursor.execute(cmd)
     if cursor.rowcount == 0:
         return False

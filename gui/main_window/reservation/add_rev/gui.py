@@ -52,7 +52,6 @@ class AddRev(Frame):
         )
 
         self.canvas.place(x=0, y=0)
-        self.canvas.place(x=0, y=0)
         self.entry_image_1 = PhotoImage(file=relative_to_assets("entry_1.png"))
         self.entry_bg_1 = self.canvas.create_image(137.5, 153.0, image=self.entry_image_1)
 
@@ -60,7 +59,7 @@ class AddRev(Frame):
             52.0,
             128.0,
             anchor="nw",
-            text="Loại phòng ",
+            text="Loại phòng:",
             fill="#5E95FF",
             font=("Montserrat Bold", 14 * -1),
         )
@@ -76,7 +75,7 @@ class AddRev(Frame):
             52.0,
             234.0,
             anchor="nw",
-            text="Khách hàng",
+            text="Khách hàng:",
             fill="#5E95FF",
             font=("Montserrat Bold", 14 * -1),
         )
@@ -92,7 +91,7 @@ class AddRev(Frame):
             293.0,
             128.0,
             anchor="nw",
-            text="Số phòng",
+            text="Số phòng:",
             fill="#5E95FF",
             font=("Montserrat Bold", 14 * -1),
         )
@@ -101,12 +100,12 @@ class AddRev(Frame):
         self.entry_bg_6 = self.canvas.create_image(382.5, 165.0, image=self.entry_image_6)
 
         self.entry_image_7 = PhotoImage(file=relative_to_assets("entry_7.png"))
-        entry_bg_7 = self.canvas.create_image(378.5, 259.0, image=self.entry_image_7)
+        self.entry_bg_7 = self.canvas.create_image(378.5, 259.0, image=self.entry_image_7)
         self.canvas.create_text(
             293.0,
             234.0,
             anchor="nw",
-            text="Ngày nhận phòng",
+            text="Ngày nhận phòng:",
             fill="#5E95FF",
             font=("Montserrat Bold", 14 * -1),
         )
@@ -159,9 +158,9 @@ class AddRev(Frame):
             border_width=0,
             fg_color="#efefef",
             button_color="#efefef",
-            text_color="#333333",
+            text_color="#777777",
             dropdown_fg_color="white",
-            dropdown_text_color="#333333",
+            dropdown_text_color="#777777",
             dropdown_hover_color="#E3EBFF",
             font=("Montserrat SemiBold", 14),
             command=self.load_available_rooms
@@ -181,9 +180,9 @@ class AddRev(Frame):
             border_width=0,
             fg_color="#efefef",
             button_color="#efefef",
-            text_color="#333333",
+            text_color="#777777",
             dropdown_fg_color="white",
-            dropdown_text_color="#333333",
+            dropdown_text_color="#777777",
             dropdown_hover_color="#E3EBFF",
             font=("Montserrat SemiBold", 14),
             
@@ -203,9 +202,9 @@ class AddRev(Frame):
             border_width=0,
             fg_color="#efefef",
             button_color="#efefef",
-            text_color="#333333",
+            text_color="#777777",
             dropdown_fg_color="white",
-            dropdown_text_color="#333333",
+            dropdown_text_color="#777777",
             dropdown_hover_color="#E3EBFF",
             font=("Montserrat SemiBold", 14),
         )
@@ -227,17 +226,6 @@ class AddRev(Frame):
         )
         self.entry_checkin.place(x=293.0, y=259.0)
 
-        # # --- Ngày Check-out ---
-        # self.entry_checkout = DateEntry(
-        #     self,
-        #     textvariable=self.data["CheckOut"],
-        #     width=18,
-        #     background="#5E95FF",
-        #     foreground="white",
-        #     borderwidth=2,
-        #     date_pattern="yyyy-mm-dd"
-        # )
-        # self.entry_checkout.place(x=180, y=215)
         # Sau khi UI được tạo xong
         self.load_all_data()
 
@@ -353,10 +341,10 @@ class AddRev(Frame):
 
             if result:
                 messagebox.showinfo(None, "Đặt phòng thành công")
-                # self.parent.navigate("view")
+                self.parent.navigate("view")
                 self.parent.refresh_entries()
             else:
-                messagebox.showerror("Lỗi", "Đặt phòng thất bại. Vui lòng kiểm tra lại thông tin.")
+                messagebox.showerror("Lỗi", "Vui lòng kiểm tra lại thông tin.")
 
         except mysql.connector.Error as e:
             messagebox.showerror("Lỗi", f"Database error: {str(e)}")
