@@ -4,8 +4,6 @@ from tkinter import Frame, Canvas, Entry, Text, Button, PhotoImage, messagebox
 import controller as db_controller
 
 from .add_ser.gui import AddSer
-from .view_ser.main import ViewSer
-from .update_ser.main import UpdateSer
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./assets")
@@ -32,8 +30,6 @@ class Services(Frame):
         # Loop through windows and place them
         self.windows = {
             "add": AddSer(self),
-            "view": ViewSer(self),
-            "edit": UpdateSer(self),
         }
 
         self.current_window = self.windows["add"]

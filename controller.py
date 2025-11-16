@@ -239,16 +239,13 @@ def add_DichVu(ma_hoadon, ma_dv, so_luong):
     if cursor.rowcount == 0:
         return False
     return True
-# Get total hotel value
-def get_total_hotel_value():
-    cmd = "select sum(price) from rooms;"
+def get_invoice_details(ma_hoadon):
+    cmd = f"""SELECT dv.TenDV, dv.DonGia, ct.SoLuong, ct.ThanhTien
+        FROM hoadon ct
+        JOIN dichvu dv ON ct.MaDV = dv.MaDV
+        WHERE ct.MaHoaDon = '{ma_hoadon}';"""
     cursor.execute(cmd)
-    if cursor.rowcount == 0:
-        return False
-    value = cursor.fetchone()[0]
-
-    return human_format(value)
-
+    return cursor.fetchall()
 
 def delete_reservation(MaHoaDon):
     cmd = f"delete from datphong where MaHoaDon='{MaHoaDon}';"

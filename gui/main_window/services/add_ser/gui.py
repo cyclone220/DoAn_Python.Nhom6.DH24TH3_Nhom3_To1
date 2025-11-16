@@ -108,26 +108,16 @@ class AddSer(Frame):
         )
 
         self.button_image_2 = PhotoImage(file=relative_to_assets("button_2.png"))
-        button_2 = Button(
+        self.button_2 = Button(
             self,
             image=self.button_image_2,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: self.parent.navigate("view"),
+            command=self.go_to_view,
             relief="flat",
         )
-        button_2.place(x=547.0, y=116.0, width=209.0, height=74.0)
-
-        self.button_image_3 = PhotoImage(file=relative_to_assets("button_3.png"))
-        button_3 = Button(
-            self,
-            image=self.button_image_3,
-            borderwidth=0,
-            highlightthickness=0,
-            command=lambda: self.parent.navigate("edit"),
-            relief="flat",
-        )
-        button_3.place(x=547.0, y=210.0, width=209.0, height=74.0)
+        self.button_2.place(x=547.0, y=116.0, width=209.0, height=74.0)
+        
         # --- Combobox chọn Mã hoá đơn ---
         self.cmb_ID = ctk.CTkComboBox(
             self,
@@ -144,8 +134,9 @@ class AddSer(Frame):
             font=("Montserrat SemiBold", 14),
         )
         self.cmb_ID.place(x=52.0, y=153.0)
-        self.cmb_ID.set("Chọn Mã hoá đơn")
         self.load_hoadon()
+        self.cmb_ID.set("Chọn Mã hoá đơn")
+        
 
         
         # --- Combobox chọn dịch vụ ---
@@ -166,9 +157,10 @@ class AddSer(Frame):
             font=("Montserrat SemiBold", 14),
         )
         self.cmb_service.place(x=52.0, y=259.0)
+        self.load_dichvu()
         self.cmb_service.set("Chọn dịch vụ")
 
-        self.load_dichvu()
+
         self.entry_SL = Entry(
             self,
             textvariable=self.data["SoLuong"],
@@ -202,10 +194,29 @@ class AddSer(Frame):
         )
         self.button_1.place(x=164.0, y=322.0, width=190.0, height=48.0)
 
-    def reset_combobox(combo, placeholder=""):
-        # Xóa giá trị hiện tại và danh sách trong combobox
-        combo.set(placeholder)
-        combo.configure(values=[])
+    def go_to_view(self):
+            # Lấy mã hóa đơn hiện đang chọn trong combobox
+            ma_hoadon = self.cmb_ID.get()
+
+            if ma_hoadon=="Chọn Mã hoá đơn":
+                messagebox.showwarning("Thông báo", "Vui lòng chọn mã hóa đơn!")
+                return
+            
+            # Lấy dữ liệu chi tiết hóa đơn từ DB
+            details = db_controller.get_invoice_details(ma_hoadon)
+
+            if not details:
+                messagebox.showinfo("Thông báo", "Hoá đơn không có dịch vụ nào.")
+                return
+
+            # Format message hiển thị
+            result = "CHI TIẾT HOÁ ĐƠN\n\nDịch vụ\tSL\tĐơn giá\tThành tiền\n"
+            result += "-" * 55 + "\n"
+
+            for row in details:
+                result += f"{row[0]}\t{row[2]}\t{row[1]:,}\t{row[3]:,}\n"
+
+            messagebox.showinfo("Thông tin hoá đơn", result)
 
     def load_hoadon(self):
         # Lấy tất cả MaHoaDon từ database
@@ -273,7 +284,6 @@ class AddSer(Frame):
         try:
             db_controller.add_DichVu(ma_hoadon,ma_dv,so_luong)
             messagebox.showinfo("Thành công", "Thêm dịch vụ vào hóa đơn thành công.")
-            # Nếu muốn refresh lại giao diện sau khi thêm
-            self.load_hoadon_details()  # ví dụ hàm load chi tiết hóa đơn
+
         except mysql.connector.Error as e:
             messagebox.showerror("Lỗi", f"Không thể thêm dịch vụ: {str(e)}")
